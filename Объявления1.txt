@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Кашалот — Объявления службы безопасности</title>
+<style>
+  :root{
+    --deep:#04283e;
+    --teal:#0f8b8d;
+    --foam:#eef7f7;
+    --alert:#ff6a3d;
+    --line:rgba(255,255,255,0.12);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    background:
+      radial-gradient(ellipse at top left, #0d5170 0%, transparent 55%),
+      radial-gradient(ellipse at bottom right, #0a3a54 0%, transparent 60%),
+      var(--deep);
+    color:var(--foam);
+    min-height:100vh;
+    padding-bottom:90px;
+  }
+
+  header{
+    padding:36px 24px 24px;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+  }
+  header::before{
+    content:"";
+    position:absolute;
+    top:-60px; left:50%;
+    transform:translateX(-50%);
+    width:900px; height:220px;
+    background:radial-gradient(ellipse, rgba(15,139,141,0.35), transparent 70%);
+    pointer-events:none;
+  }
+  .eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    font-size:12px;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--alert);
+    font-weight:700;
+    margin-bottom:10px;
+  }
+  .eyebrow::before, .eyebrow::after{
+    content:"";
+    width:22px; height:1px;
+    background:var(--alert);
+    opacity:0.6;
+  }
+  h1{
+    font-family:Georgia, 'Times New Roman', serif;
+    font-size:clamp(28px, 4.5vw, 44px);
+    margin:0 0 8px;
+    letter-spacing:0.01em;
+    color:#fff;
+  }
+  h1 .brand{color:var(--teal); font-style:italic;}
+  .sub{
+    color:rgba(238,247,247,0.65);
+    font-size:14px;
+    max-width:520px;
+    margin:0 auto;
+    line-height:1.5;
+  }
+  .wave{
+    display:block;
+    width:100%;
+    max-width:400px;
+    height:6px;
+    margin:22px auto 0;
+    border-radius:3px;
+    background:linear-gradient(90deg, transparent, var(--teal), transparent);
+    opacity:0.6;
+  }
+
+  main{max-width:920px; margin:0 auto; padding:0 20px;}
+
+  .filters{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    justify-content:center;
+    margin:8px 0 30px;
+  }
+  .filter-btn{
+    border:1px solid var(--line);
+    background:rgba(255,255,255,0.04);
+    color:var(--foam);
+    padding:9px 18px;
+    border-radius:999px;
+    font-size:13px;
+    letter-spacing:0.02em;
+    cursor:pointer;
+    transition:all .18s ease;
+    font-weight:600;
+  }
+  .filter-btn:hover{background:rgba(255,255,255,0.09); border-color:rgba(255,255,255,0.25);}
+  .filter-btn.active{background:var(--teal); border-color:var(--teal); color:#052b2c;}
+  .filter-btn .count{opacity:0.65; font-weight:400; margin-left:4px;}
+
+  .section-label{
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:0.14em;
+    color:rgba(238,247,247,0.45);
+    margin:26px 4px 10px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .section-label::after{content:""; flex:1; height:1px; background:var(--line);}
+
+  .track{
+    background:rgba(255,255,255,0.045);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:14px 16px;
+    margin-bottom:10px;
+    transition:background .15s ease, border-color .15s ease;
+  }
+  .track:hover{background:rgba(255,255,255,0.075); border-color:rgba(255,255,255,0.22);}
+  .track.playing{background:rgba(15,139,141,0.22); border-color:var(--teal);}
+  .track.missing{opacity:0.45;}
+
+  .track-row{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    cursor:pointer;
+  }
+  .track.missing .track-row{cursor:default;}
+
+  .play-btn{
+    flex:0 0 auto;
+    width:42px; height:42px;
+    border-radius:50%;
+    border:none;
+    background:var(--teal);
+    color:#052b2c;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    transition:transform .12s ease, background .15s ease;
+  }
+  .track-row:hover .play-btn{transform:scale(1.06);}
+  .play-btn:disabled{background:rgba(255,255,255,0.15);}
+  .icon{display:block; position:relative; width:14px; height:14px;}
+  .icon-play{
+    width:0; height:0;
+    border-top:7px solid transparent;
+    border-bottom:7px solid transparent;
+    border-left:11px solid #052b2c;
+    margin-left:2px;
+  }
+  .play-btn:disabled .icon-play{border-left-color:rgba(4,26,41,0.4);}
+  .icon-pause{width:14px; height:14px;}
+  .icon-pause::before, .icon-pause::after{
+    content:"";
+    position:absolute;
+    top:0;
+    width:4px;
+    height:14px;
+    background:#052b2c;
+  }
+  .icon-pause::before{left:2px;}
+  .icon-pause::after{right:2px;}
+
+  .track-info{flex:1; min-width:0;}
+  .track-name{
+    font-size:15px;
+    font-weight:600;
+    color:#fff;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .track-meta{font-size:12px; color:rgba(238,247,247,0.5); margin-top:2px;}
+  .track-meta.no-link{color:var(--alert);}
+
+  .track-bars{
+    flex:0 0 auto;
+    display:flex;
+    align-items:center;
+    gap:3px;
+    height:20px;
+    width:26px;
+  }
+  .bar{width:3px; background:var(--teal); border-radius:2px; height:6px; opacity:0.35;}
+  .track.playing .bar{animation:bounce 0.9s ease-in-out infinite;}
+  .track.playing .bar:nth-child(1){animation-delay:0s;}
+  .track.playing .bar:nth-child(2){animation-delay:.15s;}
+  .track.playing .bar:nth-child(3){animation-delay:.3s;}
+  @keyframes bounce{
+    0%,100%{height:6px; opacity:0.5;}
+    50%{height:18px; opacity:1;}
+  }
+
+  .track-player{
+    overflow:hidden;
+    max-height:0;
+    transition:max-height .25s ease, margin-top .25s ease;
+  }
+  .track.playing .track-player{max-height:40px; margin-top:12px;}
+
+  .seek-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .time{
+    font-size:11px;
+    color:rgba(238,247,247,0.55);
+    width:34px;
+    flex:0 0 auto;
+    font-variant-numeric:tabular-nums;
+  }
+  .time.end{text-align:right;}
+  .seek{
+    flex:1;
+    -webkit-appearance:none;
+    appearance:none;
+    height:4px;
+    border-radius:2px;
+    background:rgba(255,255,255,0.2);
+    outline:none;
+    cursor:pointer;
+  }
+  .seek::-webkit-slider-runnable-track{
+    height:4px; border-radius:2px;
+    background:linear-gradient(to right, var(--teal) var(--fill,0%), rgba(255,255,255,0.2) 0);
+  }
+  .seek::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width:13px; height:13px;
+    margin-top:-4.5px;
+    border-radius:50%;
+    background:#fff;
+    cursor:pointer;
+    box-shadow:0 0 0 2px var(--teal);
+  }
+  .seek::-moz-range-track{height:4px; border-radius:2px; background:rgba(255,255,255,0.2);}
+  .seek::-moz-range-progress{height:4px; border-radius:2px; background:var(--teal);}
+  .seek::-moz-range-thumb{
+    width:13px; height:13px;
+    border-radius:50%;
+    background:#fff;
+    border:2px solid var(--teal);
+    cursor:pointer;
+  }
+
+  .empty-state{text-align:center; padding:50px 20px; color:rgba(238,247,247,0.5); font-size:14px;}
+
+  .volume-bar{
+    position:fixed;
+    left:0; right:0; bottom:0;
+    background:rgba(4,26,41,0.92);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    border-top:1px solid var(--line);
+    padding:12px 20px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:12px;
+    z-index:50;
+  }
+  .volume-bar .vol-icon{font-size:18px; flex:0 0 auto;}
+  .volume-bar input[type="range"]{
+    -webkit-appearance:none;
+    appearance:none;
+    width:180px;
+    height:4px;
+    border-radius:2px;
+    background:rgba(255,255,255,0.2);
+    outline:none;
+  }
+  .volume-bar input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width:14px; height:14px;
+    border-radius:50%;
+    background:var(--alert);
+    cursor:pointer;
+    border:2px solid #fff;
+  }
+  .volume-bar input[type="range"]::-moz-range-thumb{
+    width:14px; height:14px;
+    border-radius:50%;
+    background:var(--alert);
+    cursor:pointer;
+    border:2px solid #fff;
+  }
+  .vol-label{font-size:12px; color:rgba(238,247,247,0.55); width:110px;}
+  .vol-value{font-size:12px; color:rgba(238,247,247,0.6); width:32px; text-align:right;}
+
+  ::-webkit-scrollbar{width:8px;}
+  ::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.15); border-radius:4px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Служба безопасности</div>
+  <h1>Объявления <span class="brand">«Кашалот»</span></h1>
+  <p class="sub">Аудиоролики для трансляции по аквапарку — выберите раздел и нажмите на ролик, чтобы прослушать.</p>
+  <div class="wave"></div>
+</header>
+
+<main>
+  <div class="filters" id="filters"></div>
+  <div id="list"></div>
+</main>
+
+<div class="volume-bar">
+  <span class="vol-icon">🔊</span>
+  <span class="vol-label">Общая громкость</span>
+  <input type="range" id="volume" min="0" max="100" value="80">
+  <span class="vol-value" id="volValue">80%</span>
+</div>
+
+<script>
+const ANNOUNCEMENTS = [
+  {name:"Запрещается!", cat:"Запреты", url:"https://raw.githubusercontent.com/gryu36-dotcom/-/main/zapreshaetsy.mp3"},
+  {name:"Тарелки", cat:"Запреты", url:"https://raw.githubusercontent.com/gryu36-dotcom/-/main/Tarelki.mp3"},
+  {name:"Тапочки", cat:"Запреты", url:"https://raw.githubusercontent.com/gryu36-dotcom/-/main/Tapki.mp3"},
+  {name:"Зонты", cat:"Экстренные", url:"https://raw.githubusercontent.com/gryu36-dotcom/-/main/zonti.mp3"},
+  {name:"За час до закрытия", cat:"Закрытие", url:"https://raw.githubusercontent.com/gryu36-dotcom/-/main/za%20CHas.mp3"},
+  {name:"За полчаса до закрытия", cat:"Закрытие", url:"https://raw.githubusercontent.com/gryu36-dotcom/-/main/za30min.mp3"},
+  {name:"Кукуруза", cat:"Реклама", url:null},
+  {name:"Напитки", cat:"Реклама", url:null},
+  {name:"Плавательные аксессуары", cat:"Реклама", url:null},
+  {name:"Горки", cat:"Приглашения", url:"https://raw.githubusercontent.com/gryu36-dotcom/-/main/Gorki.mp3"},
+];
+
+const categories = [...new Set(ANNOUNCEMENTS.map(a => a.cat))];
+let activeFilter = "Все";
+let currentIndex = null;
+
+const filtersEl = document.getElementById('filters');
+const listEl = document.getElementById('list');
+const volumeSlider = document.getElementById('volume');
+const volValue = document.getElementById('volValue');
+
+const audio = new Audio();
+audio.volume = volumeSlider.value / 100;
+
+function fmtTime(s){
+  if(!isFinite(s) || s < 0) s = 0;
+  const m = Math.floor(s/60);
+  const sec = Math.floor(s%60).toString().padStart(2,'0');
+  return `${m}:${sec}`;
+}
+
+function buildFilters(){
+  const counts = {};
+  ANNOUNCEMENTS.forEach(a => counts[a.cat] = (counts[a.cat]||0)+1);
+  filtersEl.appendChild(makeFilterBtn("Все", ANNOUNCEMENTS.length));
+  categories.forEach(cat => filtersEl.appendChild(makeFilterBtn(cat, counts[cat])));
+}
+
+function makeFilterBtn(label, count){
+  const btn = document.createElement('button');
+  btn.className = 'filter-btn' + (label === activeFilter ? ' active' : '');
+  btn.innerHTML = `${label}<span class="count">${count}</span>`;
+  btn.addEventListener('click', () => {
+    activeFilter = label;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderList();
+  });
+  return btn;
+}
+
+function renderList(){
+  listEl.innerHTML = '';
+  const filtered = ANNOUNCEMENTS
+    .map((a,i) => ({...a, idx:i}))
+    .filter(a => activeFilter === "Все" || a.cat === activeFilter);
+
+  if(filtered.length === 0){
+    listEl.innerHTML = '<div class="empty-state">В этом разделе пока нет роликов.</div>';
+    return;
+  }
+
+  let lastCat = null;
+  filtered.forEach(item => {
+    if(activeFilter === "Все" && item.cat !== lastCat){
+      lastCat = item.cat;
+      const label = document.createElement('div');
+      label.className = 'section-label';
+      label.textContent = item.cat;
+      listEl.appendChild(label);
+    }
+    listEl.appendChild(makeTrackRow(item));
+  });
+}
+
+function makeTrackRow(item){
+  const row = document.createElement('div');
+  const isActive = currentIndex === item.idx;
+  row.className = 'track' + (item.url ? '' : ' missing') + (isActive ? ' playing' : '');
+  row.dataset.idx = item.idx;
+
+  const isPlayingNow = isActive && !audio.paused;
+  const iconClass = isPlayingNow ? 'icon-pause' : 'icon-play';
+
+  row.innerHTML = `
+    <div class="track-row">
+      <button class="play-btn" ${item.url ? '' : 'disabled'} aria-label="Воспроизвести" tabindex="-1">
+        <span class="icon ${iconClass}"></span>
+      </button>
+      <div class="track-info">
+        <div class="track-name">${item.name}</div>
+        <div class="track-meta ${item.url ? '' : 'no-link'}">${item.cat}${item.url ? '' : ' · ссылка не указана'}</div>
+      </div>
+      <div class="track-bars"><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>
+    </div>
+    <div class="track-player">
+      ${isActive ? `
+      <div class="seek-row">
+        <span class="time cur">0:00</span>
+        <input type="range" class="seek" min="0" max="100" value="0" step="0.1">
+        <span class="time end">0:00</span>
+      </div>` : ''}
+    </div>
+  `;
+
+  if(item.url){
+    row.querySelector('.track-row').addEventListener('click', () => toggleTrack(item.idx));
+  }
+
+  if(isActive){
+    const seek = row.querySelector('.seek');
+    seek.addEventListener('input', () => {
+      const pct = seek.value;
+      seek.style.setProperty('--fill', pct + '%');
+      if(audio.duration){
+        audio.currentTime = (pct/100) * audio.duration;
+      }
+    });
+    row._seek = seek;
+    row._curTime = row.querySelector('.time.cur');
+    row._endTime = row.querySelector('.time.end');
+    updateProgressUI(row);
+  }
+
+  return row;
+}
+
+function updateProgressUI(row){
+  if(!row || !row._seek) return;
+  const dur = audio.duration || 0;
+  const cur = audio.currentTime || 0;
+  const pct = dur ? (cur/dur*100) : 0;
+  row._seek.value = pct;
+  row._seek.style.setProperty('--fill', pct + '%');
+  row._curTime.textContent = fmtTime(cur);
+  row._endTime.textContent = fmtTime(dur);
+}
+
+function getActiveRow(){
+  return listEl.querySelector(`.track[data-idx="${currentIndex}"]`);
+}
+
+function toggleTrack(idx){
+  const item = ANNOUNCEMENTS[idx];
+  if(!item.url) return;
+
+  if(currentIndex === idx){
+    if(audio.paused){ audio.play(); } else { audio.pause(); }
+    renderList();
+    return;
+  }
+
+  currentIndex = idx;
+  audio.src = item.url;
+  audio.play().catch(() => {});
+  renderList();
+}
+
+audio.addEventListener('timeupdate', () => updateProgressUI(getActiveRow()));
+audio.addEventListener('loadedmetadata', () => updateProgressUI(getActiveRow()));
+audio.addEventListener('play', renderList);
+audio.addEventListener('pause', renderList);
+audio.addEventListener('ended', () => { renderList(); });
+
+volumeSlider.addEventListener('input', () => {
+  const v = volumeSlider.value;
+  audio.volume = v / 100;
+  volValue.textContent = v + '%';
+});
+
+buildFilters();
+renderList();
+</script>
+
+</body>
+</html>
